@@ -49,7 +49,7 @@ npm run dev
 ```
 ### :three: . Vista de la pagina
 
-Escribir en el navegador http://127.0.0.1:3000/ para ver la aplicacion.
+Escribir en el navegador http://127.0.0.1:3001/ para ver la aplicacion.
 
 ## 🛠 &nbsp;Tech Stack
 
