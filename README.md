@@ -10,11 +10,11 @@
 <br/>
 <br/>
 
-# Tabla de Contenido Proyecto Django
-- [Instalación](#instalación)
-- [Tech Stack](#tech-stack)
-- [Development](#development)
-- [Version Controll & Tools](#version-controll--tools)
+# Tabla de Contenido Proyecto Ferreteria Ferramas
+- [Instalación](#Instalación)
+- [Tech Stack](#Tech_stack)
+- [Development](#Development)
+- [Version Controll & Tools](#Version_controll_-tools)
 
 ## INSTALACION
 
