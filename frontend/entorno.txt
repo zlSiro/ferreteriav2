@@ -1,0 +1,4 @@
+API_URL=http://localhost:3000
+DOMAIN=localhost
+NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_DOMAIN=http://localhost:3001

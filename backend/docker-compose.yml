@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: aiur1991
+      POSTGRES_DB: prueba_postgres_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  #     - ./init/postgres:/docker-entrypoint-initdb.d # solo en el note
+
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: mysql_db
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: aiur1991
+  #     MYSQL_DATABASE: mysql_db
+  #     MYSQL_USER: admin
+  #     MYSQL_PASSWORD: aiur1991
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #     - ./init/mysql:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres_data:
+  #mysql_data:
