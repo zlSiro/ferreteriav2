@@ -1,192 +1,338 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
-import Heading from '@/components/ui/Heading';
-import { Spinner } from '@/components/ui/Spinner';
+import { useStore } from '@/src/store';
+
+interface PaymentResult {
+  status: string;
+  amount: number;
+  buy_order: string;
+  transaction_date: string;
+  authorization_code?: string;
+  payment_type_code?: string;
+  response_code?: number;
+  installments_number?: number;
+  card_detail?: {
+    card_number: string;
+  };
+}
 
 export default function ConfirmPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const token = searchParams.get('token_ws');
-  const orderId = searchParams.get('order');
-  const [paymentData, setPaymentData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  const [result, setResult] = useState<PaymentResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Limpiar carrito después de pago exitoso
+  const clearCart = useStore(state => state.clearCart);
 
   useEffect(() => {
-    if (!token) {
-      setError('Token de pago no encontrado');
-      setIsLoading(false);
-      return;
-    }
+    if (token) {
+      const confirmTransaction = async () => {
+        try {
+          setIsLoading(true);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/confirm?token_ws=${token}`, {
+            method: 'GET',
+          });
 
-    const confirmPayment = async () => {
-      try {
-        setIsLoading(true);
-        
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/payment/confirm?token_ws=${token}`,
-          {
-            method: 'GET', // Cambiado a POST para mejor seguridad
-            headers: {
-              'Content-Type': 'application/json',
-            },
+          if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
           }
+
+          const data = await response.json();
+          
+          if (data.success) {
+            setResult(data.data);
+            // Si el pago fue exitoso, limpiar el carrito
+            if (data.data.status === 'AUTHORIZED') {
+              clearCart();
+              toast.success('¡Pago confirmado con éxito!');
+            }
+          } else {
+            setError(data.error);
+            toast.error('Error al confirmar el pago');
+          }
+        } catch (err) {
+          setError('Error al confirmar la transacción');
+          toast.error('Error al confirmar la transacción');
+          console.error('Error detallado:', err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      confirmTransaction();
+    } else {
+      setError('Token de transacción no válido');
+      setIsLoading(false);
+    }
+  }, [token, clearCart]);
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'AUTHORIZED':
+        return (
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
         );
+      case 'REJECTED':
+      case 'FAILED':
+        return (
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </div>
+        );
+      default:
+        return (
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+        );
+    }
+  };
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
+  const getStatusMessage = (status: string) => {
+    switch (status) {
+      case 'AUTHORIZED':
+        return {
+          title: '¡Pago Exitoso!',
+          description: 'Tu transacción ha sido procesada correctamente.',
+          color: 'text-green-800'
+        };
+      case 'REJECTED':
+        return {
+          title: 'Pago Rechazado',
+          description: 'La transacción fue rechazada por el banco.',
+          color: 'text-red-800'
+        };
+      case 'FAILED':
+        return {
+          title: 'Pago Fallido',
+          description: 'Hubo un error al procesar tu pago.',
+          color: 'text-red-800'
+        };
+      default:
+        return {
+          title: 'Estado del Pago',
+          description: 'Revisa los detalles de tu transacción.',
+          color: 'text-yellow-800'
+        };
+    }
+  };
 
-        const result = await response.json();
-        
-        if (!result.success) {
-          throw new Error(result.message || 'Error al confirmar el pago');
-        }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-CL', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
-        setPaymentData(result.data);
-        toast.success('¡Pago confirmado exitosamente!');
-      } catch (err) {
-        console.error('Error en confirmación:', err);
-        setError(err instanceof Error ? err.message : 'Error desconocido');
-        toast.error('Hubo un problema al confirmar tu pago');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
 
-    confirmPayment();
-  }, [token]);
-
+  // Estados de carga
   if (isLoading) {
     return (
-      <div className="container mx-auto p-4 text-center">
-        <Spinner className="mx-auto my-8" />
-        <p className="text-lg">Verificando tu pago...</p>
-        {orderId && (
-          <p className="text-sm text-gray-500 mt-2">
-            Orden: {orderId}
-          </p>
-        )}
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Procesando pago...</h2>
+          <p className="text-gray-600">Por favor espera mientras confirmamos tu transacción.</p>
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !result) {
     return (
-      <div className="container mx-auto p-4 max-w-md">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <Heading>Error en el pago</Heading>
-          <p className="mb-4">{error}</p>
-          <div className="flex gap-4">
-            <Link
-              href="/"
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded text-center"
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          
+          <h1 className="text-2xl font-bold text-red-800 mb-2">Error en el Pago</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push('/')}
+              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
-              Volver al inicio
-            </Link>
-            <Link
-              href="/cart"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center"
+              Volver a la Tienda
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
             >
-              Reintentar pago
-            </Link>
+              Intentar Nuevamente
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!paymentData) {
+  if (!result) {
     return (
-      <div className="container mx-auto p-4 text-center">
-        <p>No se recibieron datos del pago</p>
-        <Link
-          href="/"
-          className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Volver al inicio
-        </Link>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Esperando respuesta del servidor...</p>
+        </div>
       </div>
     );
   }
+
+  const statusInfo = getStatusMessage(result.status);
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-green-500 p-4 text-white">
-          <Heading>¡Pago Exitoso!</Heading>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-2xl mx-auto px-4">
+        {/* Header con botón de volver */}
+        <div className="mb-8">
+          <Link 
+            href="/" 
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Volver a la tienda
+          </Link>
         </div>
-        
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-bold text-lg mb-2">Resumen del Pago</h3>
-              <dl className="space-y-2">
-                <div className="flex justify-between">
-                  <dt className="text-gray-600">Estado:</dt>
-                  <dd className="font-medium">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                      {paymentData.status}
-                    </span>
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-gray-600">Monto:</dt>
-                  <dd className="font-medium">${paymentData.amount.toLocaleString('es-CL')}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-gray-600">Orden:</dt>
-                  <dd className="font-mono">{paymentData.buy_order}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-gray-600">Fecha:</dt>
-                  <dd className="font-medium">
-                    {new Date(paymentData.transaction_date).toLocaleString('es-CL')}
-                  </dd>
-                </div>
-                {paymentData.card_number && (
-                  <div className="flex justify-between">
-                    <dt className="text-gray-600">Tarjeta:</dt>
-                    <dd className="font-medium">**** **** **** {paymentData.card_number}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-bold text-lg mb-2">Siguientes pasos</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <span className="mr-2">📧</span>
-                  <span>Recibirás un correo con los detalles de tu compra</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🛒</span>
-                  <span>Puedes ver el estado de tu pedido en tu cuenta</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">📦</span>
-                  <span>Recibirás actualizaciones sobre el envío</span>
-                </li>
-              </ul>
+        {/* Tarjeta principal */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          {/* Header de la tarjeta */}
+          <div className="text-center py-8 px-6 border-b">
+            {getStatusIcon(result.status)}
+            <h1 className={`text-3xl font-bold mb-2 ${statusInfo.color}`}>
+              {statusInfo.title}
+            </h1>
+            <p className="text-gray-600 text-lg">
+              {statusInfo.description}
+            </p>
+          </div>
+
+          {/* Detalles de la transacción */}
+          <div className="p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Detalles de la Transacción</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Monto */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <dt className="text-sm font-medium text-gray-500 mb-1">Monto Pagado</dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {formatAmount(result.amount)}
+                </dd>
+              </div>
+
+              {/* Estado */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <dt className="text-sm font-medium text-gray-500 mb-1">Estado</dt>
+                <dd className={`text-lg font-semibold ${
+                  result.status === 'AUTHORIZED' ? 'text-green-600' :
+                  result.status === 'REJECTED' || result.status === 'FAILED' ? 'text-red-600' :
+                  'text-yellow-600'
+                }`}>
+                  {result.status === 'AUTHORIZED' ? 'Autorizado' :
+                   result.status === 'REJECTED' ? 'Rechazado' :
+                   result.status === 'FAILED' ? 'Fallido' : result.status}
+                </dd>
+              </div>
+
+              {/* Número de orden */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <dt className="text-sm font-medium text-gray-500 mb-1">Número de Orden</dt>
+                <dd className="text-lg font-mono text-gray-900">
+                  {result.buy_order}
+                </dd>
+              </div>
+
+              {/* Fecha */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <dt className="text-sm font-medium text-gray-500 mb-1">Fecha y Hora</dt>
+                <dd className="text-lg text-gray-900">
+                  {formatDate(result.transaction_date)}
+                </dd>
+              </div>
+
+              {/* Código de autorización */}
+              {result.authorization_code && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <dt className="text-sm font-medium text-gray-500 mb-1">Código de Autorización</dt>
+                  <dd className="text-lg font-mono text-gray-900">
+                    {result.authorization_code}
+                  </dd>
+                </div>
+              )}
+
+              {/* Últimos 4 dígitos de la tarjeta */}
+              {result.card_detail?.card_number && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <dt className="text-sm font-medium text-gray-500 mb-1">Tarjeta Utilizada</dt>
+                  <dd className="text-lg font-mono text-gray-900">
+                    **** **** **** {result.card_detail.card_number}
+                  </dd>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 mt-6">
-            <Link
-              href="/"
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded text-center"
-            >
-              Seguir comprando
-            </Link>
-            <Link
-              href="/orders"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-center"
-            >
-              Ver mis pedidos
-            </Link>
+          {/* Acciones */}
+          <div className="bg-gray-50 px-6 py-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => router.push('/')}
+                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Continuar Comprando
+              </button>
+              
+              {result.status === 'AUTHORIZED' && (
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                >
+                  Imprimir Comprobante
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Información adicional */}
+        <div className="mt-8 bg-blue-50 rounded-lg p-6">
+          <h3 className="font-semibold text-blue-900 mb-2">¿Necesitas ayuda?</h3>
+          <p className="text-blue-800 text-sm mb-3">
+            Si tienes alguna consulta sobre tu compra, no dudes en contactarnos.
+          </p>
+          <div className="text-sm text-blue-700">
+            <p>📧 Email: soporte@tienda.com</p>
+            <p>📞 Teléfono: +56 2 1234 5678</p>
           </div>
         </div>
       </div>
