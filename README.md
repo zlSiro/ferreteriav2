@@ -1,77 +1,83 @@
+<h1 align="center">Ferreteria Ferramas</h1>
+<h2 align="center">Tu ferreteria de confianza</h2>
 
+<p><img align="right" height="250" width="250" src="https://raw.githubusercontent.com/SubhadeepZilong/SubhadeepZilong/main/icons/animation_500_kxa883sd.gif" alt="SubhadeepZilong" /></p>
 
-## Description
+&emsp;
+<h3 align="left">Hola 👋, instructivo de como instalar y acceder al proyecto.</h3>
+&emsp;
+<br/>
+<br/>
+<br/>
 
-Desarrollo web para la Ferreteria Ferramas
+# Tabla de Contenido Proyecto Django
+- [Instalación](#instalación)
+- [Tech Stack](#tech-stack)
+- [Development](#development)
+- [Version Controll & Tools](#version-controll--tools)
 
-## Primero lo Primero
+## INSTALACION
 
-```bash
-$ npm install
+### :one: . Instalar los paquetes de NodeJS en ambas carpetas
+
+En la carpeta del proyecto usando PowerShell usar el siguiente comando:
+
+ ```bash
+cd backend
+npm install
+cd..
+
+cd frontend
+npm install
+cd..
 ```
 
-## Compile and run the project
+### :two: . Iniciar los servidores del backend y frontend. 
 
-```bash
-# development
-$ npm run start
+En la carpeta del proyecto usando PowerShell usar los siguientes comandos:
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+ ```bash
+cd backend
+npm run start:dev
 ```
 
-## Run tests
+En otra terminal ejecutar el siguiente comando
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+ ```bash
+cd frontend
+npm run dev
 ```
+### :three: . Vista de la pagina
 
-## Deployment
+Escribir en el navegador http://127.0.0.1:3000/ para ver la aplicacion.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 🛠 &nbsp;Tech Stack
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+![TypeScript](https://img.shields.io/badge/typescript-3670A0?style=for-the-badge&logo=typescript&logoColor=ffdd54)&nbsp;
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)&nbsp;
+![TailWind](https://img.shields.io/badge/tailwindcss-%23563D7C.svg?style=for-the-badge&logo=tailwindcdd&logoColor=white)&nbsp;
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)&nbsp;
+![React](https://img.shields.io/badge/react-%231572B6.svg?style=for-the-badge&logo=react&logoColor=white)&nbsp;
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## ⚙️ Development
+![NestJS](https://img.shields.io/badge/NextJS-092E20?style=flat&logo=next.js&logoColor=white)&nbsp;
+![NextJS](https://img.shields.io/badge/NestJS-092E20?style=flat&logo=nestjs&logoColor=white)&nbsp;
 
-## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🧰 &nbsp;Version Controll & Tools 
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)&nbsp;
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)&nbsp;
+![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)&nbsp;
 
-## Support
+## Autores
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+[<sub>Juan Pablo Valdebenito</sub>](https://github.com/zlSirodev)<br>
+[<sub>Diana Guerrero</sub>](https://github.com/DiaGuerrero)<br>
+[<sub>Jeremy Perez</sub>]()<br>
+[<sub>Paulina Muñoz</sub>]()<br>
+[<sub>Jeremy Perez</sub>]()<br>
+<br/>
+Copyright © 2025. Integracion de Plataformas.
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
