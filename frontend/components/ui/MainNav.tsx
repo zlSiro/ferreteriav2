@@ -27,11 +27,14 @@ export default async function MainNav() {
             href={`/${category.id}`}
             className="text-white hover:text-green-400 font-bold p-2"
           >{category.name}</Link>
-        ))}
-        <Link
+        ))}        <Link
           href={"/admin/sales"}
           className="rounded bg-green-400 font-bold py-2 px-10"
         >Panel de Administracion</Link>
+        <Link
+          href={"/login"}
+          className="rounded bg-blue-600 hover:bg-blue-700 font-bold py-2 px-10 text-white transition-colors duration-200"
+        >Iniciar Sesión</Link>
       </nav>
     </header>
   );
