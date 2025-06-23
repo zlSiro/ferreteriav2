@@ -5,7 +5,7 @@ import { GetProductQueryDto } from './dto/get-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadImageService } from 'src/upload-image/upload-image.service';
+import { UploadImageService } from '../upload-image/upload-image.service';
 
 @Controller('products')
 export class ProductsController {
