@@ -62,27 +62,36 @@ cd backend
 npm test -- --testPathPattern=".*integration.*"
 ```
 
-### Tests del Frontend (Carrito de Compras)
+### Tests del Frontend
+
+#### Carrito de Compras (Zustand Store)
 ```bash
 cd frontend
-npm test
+npm test shopping-cart.store.test.ts
 npm run test:coverage
 ```
 
-#### Cobertura de Tests del Carrito
-- **Statements**: 100%
-- **Functions**: 100% 
-- **Lines**: 100%
-- **Branches**: 90%
+#### Autenticación y Login  
+```bash
+cd frontend
+npm test auth.context.test.tsx
+npm test login.integration.test.tsx
+```
+
+#### Cobertura de Tests
+- **Carrito de Compras**: 29 tests (100% statements, 90% branches)
+- **Autenticación**: 32 tests (AuthContext + Login UI)
+- **Transbank**: Tests de integración (OK, NOT OK, OK NO DATA)
 
 #### Escenarios Cubiertos
-- ✅ **OK**: Tests exitosos (15 tests)
-- ❌ **NOT OK**: Manejo de errores (8 tests)  
-- 📝 **OK NO DATA**: Casos límite y sin datos (6 tests)
+- ✅ **OK**: Tests exitosos 
+- ❌ **NOT OK**: Manejo de errores  
+- 📝 **OK NO DATA**: Casos límite y sin datos
 
 Para más información sobre los tests:
 - Backend: `backend/test/README.md`
-- Frontend: `frontend/test/README.md`
+- Frontend Carrito: `frontend/test/README.md`
+- Frontend Login: `frontend/test/LOGIN_README.md`
 
 ## 🛠 &nbsp;Tech Stack
 
