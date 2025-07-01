@@ -1,11 +1,19 @@
 {
+  "preset": "ts-jest",
   "testEnvironment": "jsdom",
   "setupFilesAfterEnv": ["<rootDir>/test/setup.ts"],
   "moduleNameMapping": {
     "^@/(.*)$": "<rootDir>/$1"
   },
   "transform": {
-    "^.+\\.(ts|tsx)$": "ts-jest"
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        "tsconfig": {
+          "jsx": "react-jsx"
+        }
+      }
+    ]
   },
   "testMatch": [
     "<rootDir>/test/**/*.test.(ts|tsx)"
@@ -13,6 +21,11 @@
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"],
   "collectCoverageFrom": [
     "src/**/*.{ts,tsx}",
+    "contexts/**/*.{ts,tsx}",
+    "app/**/page.{ts,tsx}",
     "!src/**/*.d.ts"
+  ],
+  "transformIgnorePatterns": [
+    "node_modules/(?!(.*\\.mjs$))"
   ]
 }
