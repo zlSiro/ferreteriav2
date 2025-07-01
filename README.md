@@ -14,6 +14,7 @@
 - [Instalación](#Instalación)
 - [Tech Stack](#Tech_stack)
 - [Development](#Development)
+- [Testing](#Testing)
 - [Version Controll & Tools](#Version_controll_-tools)
 
 ## INSTALACION
@@ -50,6 +51,38 @@ npm run dev
 ### :three: . Vista de la pagina
 
 Escribir en el navegador http://127.0.0.1:3001/ para ver la aplicacion.
+
+## 🧪 Testing
+
+El proyecto incluye tests completos para las funcionalidades críticas:
+
+### Tests del Backend (Transbank)
+```bash
+cd backend
+npm test -- --testPathPattern=".*integration.*"
+```
+
+### Tests del Frontend (Carrito de Compras)
+```bash
+cd frontend
+npm test
+npm run test:coverage
+```
+
+#### Cobertura de Tests del Carrito
+- **Statements**: 100%
+- **Functions**: 100% 
+- **Lines**: 100%
+- **Branches**: 90%
+
+#### Escenarios Cubiertos
+- ✅ **OK**: Tests exitosos (15 tests)
+- ❌ **NOT OK**: Manejo de errores (8 tests)  
+- 📝 **OK NO DATA**: Casos límite y sin datos (6 tests)
+
+Para más información sobre los tests:
+- Backend: `backend/test/README.md`
+- Frontend: `frontend/test/README.md`
 
 ## 🛠 &nbsp;Tech Stack
 
